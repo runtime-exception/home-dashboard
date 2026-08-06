@@ -1,0 +1,146 @@
+dashboard:
+  title: Tools Center
+  description: 统一管理和访问个人部署工具
+
+networkTest:
+  # 示例探测地址：请替换为你的局域网主机地址。
+  ip: 192.0.2.10
+  port: 8081
+  protocol: http
+  timeoutMs: 3000
+
+tools:
+  - id: pdf
+    title: PDF Tools
+    description: PDF 合并、拆分、压缩与格式转换，一站式处理常用文档任务。
+    icon: https://icons.example.com/pdf.svg
+    internalUrl: http://192.0.2.10:8081
+    publicUrl: https://pdf.tools.example.com
+    accent: "#f06b78"
+    enabled: true
+
+  - id: converter
+    title: ConvertX
+    description: 快速转换图片、文档、音视频等多种文件格式。
+    icon: https://icons.example.com/converter.png
+    internalUrl: http://192.0.2.10:8082
+    publicUrl: https://converter.tools.example.com
+    accent: "#f0b44e"
+    enabled: true
+
+  - id: omnitools
+    title: Omnitools
+    description: 面向日常开发和办公场景的在线工具集合。
+    icon: https://icons.example.com/omnitools.svg
+    internalUrl: http://192.0.2.10:8083
+    publicUrl: https://omnitools.tools.example.com
+    accent: "#5f86ff"
+    enabled: true
+
+  - id: lama
+    title: Lama Cleaner
+    description: 使用 AI 快速移除图片对象、修复瑕疵并智能补全背景。
+    icon: https://icons.example.com/lama.ico
+    internalUrl: http://192.0.2.10:8084
+    publicUrl: ""
+    accent: "#19c9aa"
+    enabled: true
+
+  - id: filecodebox
+    title: FileCodeBox
+    description: 通过取件码快速分享和传输文件，适合跨设备临时交换资料。
+    icon: https://icons.example.com/filecodebox.png
+    internalUrl: http://192.0.2.10:8085
+    publicUrl: https://files.tools.example.com
+    accent: "#a978ff"
+    enabled: true
+
+  - id: music-scraper
+    title: MusicScraper
+    description: 音乐资源检索与采集工具，集中处理音乐内容获取任务。
+    icon: https://icons.example.com/music-scraper.ico
+    internalUrl: http://192.0.2.10:8086
+    publicUrl: https://music-scraper.tools.example.com
+    accent: "#ec4899"
+    enabled: true
+
+  - id: navidrome
+    title: Navidrome
+    description: 自托管音乐流媒体服务，随时访问和播放个人音乐库。
+    icon: https://icons.example.com/navidrome.png
+    internalUrl: http://192.0.2.10:8087
+    publicUrl: https://music.tools.example.com
+    accent: "#ef4444"
+    enabled: true
+
+  - id: lucky
+    title: Lucky
+    description: 网络运维工具，提供动态域名、端口转发和反向代理等能力。
+    icon: https://icons.example.com/lucky.svg
+    internalUrl: http://192.0.2.10:8088
+    publicUrl: https://lucky.tools.example.com
+    accent: "#22c55e"
+    enabled: true
+
+  - id: siyuan
+    title: 思源笔记
+    description: 隐私优先的个人知识管理与双向链接笔记软件。
+    icon: https://icons.example.com/notes.ico
+    internalUrl: http://192.0.2.10:8089
+    publicUrl: https://notes.tools.example.com
+    accent: "#d97706"
+    enabled: true
+
+  - id: 1panel
+    title: 1Panel
+    description: 现代化 Linux 服务器运维管理面板。
+    icon: https://icons.example.com/1panel.png
+    internalUrl: http://192.0.2.10:8090
+    publicUrl: https://panel.tools.example.com
+    accent: "#14b8a6"
+    enabled: true
+
+  - id: dpanel
+    title: DPanel 面板
+    description: 轻量化 Docker 容器、镜像和 Compose 项目管理面板。
+    icon: https://icons.example.com/dpanel.ico
+    internalUrl: http://192.0.2.10:8091
+    publicUrl: https://dpanel.tools.example.com
+    accent: "#3b82f6"
+    enabled: false
+
+  - id: magic-resume
+    title: Magic-Resume
+    description: 简历创建、编辑与管理工具，快速生成专业简历。
+    icon: https://icons.example.com/resume.svg
+    internalUrl: http://192.0.2.10:8092
+    publicUrl: https://resume.tools.example.com
+    accent: "#8b5cf6"
+    enabled: true
+
+  - id: octopus
+    title: Octopus
+    description: AI 服务工作台，集中访问智能应用与相关能力。
+    icon: https://icons.example.com/octopus.ico
+    internalUrl: http://192.0.2.10:8093
+    publicUrl: https://ai.tools.example.com
+    accent: "#06b6d4"
+    enabled: true
+
+  - id: litepan
+    title: LitePan
+    description: 轻量文件存储与网盘服务，便捷管理和分享文件。
+    icon: https://icons.example.com/litepan.ico
+    internalUrl: http://192.0.2.10:8094
+    publicUrl: https://drive.tools.example.com
+    accent: "#6366f1"
+    enabled: true
+
+  - id: dockerports
+    title: Docker Ports
+    description: Docker 容器端口映射管理工具
+    icon: https://icons.example.com/docker-ports.ico
+    internalUrl: http://192.0.2.10:8095
+    publicUrl: https://ports.tools.example.com
+    accent: "#a978ff"
+    enabled: true
