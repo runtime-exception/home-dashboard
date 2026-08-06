@@ -44,6 +44,8 @@ docker-tools-dashboard/
 
 ## 快速启动
 
+从源码构建并启动：
+
 ```bash
 docker compose up -d --build
 ```
@@ -52,6 +54,76 @@ docker compose up -d --build
 
 ```bash
 DASHBOARD_PORT=9000 docker compose up -d --build
+```
+
+## 使用 Docker Hub 镜像部署
+
+公开镜像：[yangbao93/home-dashboard](https://hub.docker.com/r/yangbao93/home-dashboard)
+
+- `latest`：最新稳定版本
+- `1.0.0`：固定版本
+- 支持 `linux/amd64` 和 `linux/arm64`
+
+部署前请准备好自定义的 `conf.yml`。可以复制本仓库中的示例配置，再将其中的 IP、端口、域名和图标地址替换为自己的服务地址。
+
+### 使用 Docker 命令
+
+```bash
+docker pull yangbao93/home-dashboard:latest
+
+docker run -d \
+  --name home-dashboard \
+  --restart unless-stopped \
+  -p 8080:80 \
+  -v "$(pwd)/conf.yml:/etc/docker-tools/conf.yml:ro" \
+  yangbao93/home-dashboard:latest
+```
+
+启动后访问 <http://localhost:8080>。
+
+升级到最新镜像：
+
+```bash
+docker pull yangbao93/home-dashboard:latest
+docker rm -f home-dashboard
+
+docker run -d \
+  --name home-dashboard \
+  --restart unless-stopped \
+  -p 8080:80 \
+  -v "$(pwd)/conf.yml:/etc/docker-tools/conf.yml:ro" \
+  yangbao93/home-dashboard:latest
+```
+
+### 使用 Docker Compose
+
+新建 `compose.yml`：
+
+```yaml
+name: home-dashboard
+
+services:
+  home-dashboard:
+    image: yangbao93/home-dashboard:latest
+    container_name: home-dashboard
+    restart: unless-stopped
+    ports:
+      - "${DASHBOARD_PORT:-8080}:80"
+    volumes:
+      - ./conf.yml:/etc/docker-tools/conf.yml:ro
+```
+
+启动服务：
+
+```bash
+docker compose up -d
+```
+
+拉取新镜像并更新服务：
+
+```bash
+docker compose pull
+docker compose up -d
 ```
 
 ## 配置工具
