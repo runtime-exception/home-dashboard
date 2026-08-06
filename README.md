@@ -2,6 +2,10 @@
 
 一个基于 Vue 3、Vite、TypeScript、NGINX 和 Docker Compose 的个人工具导航门户。门户从 `conf.yml` 读取卡片配置，在首页加载时通过后台检查每个工具的内网地址，并根据“内网/公网”开关直接跳转到对应的原始网址。
 
+## 界面预览
+
+![Tools Center 首页](./首页.jpg)
+
 ## 功能
 
 - 三列响应式工具卡片布局
@@ -33,6 +37,7 @@ docker-tools-dashboard/
 │   ├── Dockerfile
 │   ├── generate-config.sh         # 生成前端配置与健康检查路由
 │   └── nginx.conf
+├── 首页.jpg                        # 首页界面预览
 ├── docker-compose.yml
 └── README.md
 ```
