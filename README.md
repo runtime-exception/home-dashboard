@@ -56,29 +56,29 @@ docker compose up -d --build
 DASHBOARD_PORT=9000 docker compose up -d --build
 ```
 
-## 使用 Docker Hub 镜像部署
+## 使用 GHCR 镜像部署
 
-公开镜像：[yangbao93/home-dashboard](https://hub.docker.com/r/yangbao93/home-dashboard)
+容器镜像：[ghcr.io/runtime-excpetion/home-dashboard](https://github.com/runtime-excpetion/home-dashboard/pkgs/container/home-dashboard)
 
 - `latest`：最新稳定版本
 - `1.0.0`：固定版本
 - 支持 `linux/amd64` 和 `linux/arm64`
 
-仓库中的 Docker workflow 会在推送到 `main` 分支或推送 `v*` 标签时，自动验证上述两个平台的镜像构建，但不会登录 Docker Hub 或推送镜像。
+仓库中的 Docker workflow 会在推送到 `main` 分支或推送 `v*` 标签时，自动构建上述两个平台的镜像并推送到 GitHub Container Registry。
 
 部署前请准备好自定义的 `conf.yml`。可以复制本仓库中的示例配置，再将其中的 IP、端口、域名和图标地址替换为自己的服务地址。
 
 ### 使用 Docker 命令
 
 ```bash
-docker pull yangbao93/home-dashboard:latest
+docker pull ghcr.io/runtime-excpetion/home-dashboard:latest
 
 docker run -d \
   --name home-dashboard \
   --restart unless-stopped \
   -p 8080:80 \
   -v "$(pwd)/conf.yml:/etc/docker-tools/conf.yml:ro" \
-  yangbao93/home-dashboard:latest
+  ghcr.io/runtime-excpetion/home-dashboard:latest
 ```
 
 启动后访问 <http://localhost:8080>。
@@ -86,7 +86,7 @@ docker run -d \
 升级到最新镜像：
 
 ```bash
-docker pull yangbao93/home-dashboard:latest
+docker pull ghcr.io/runtime-excpetion/home-dashboard:latest
 docker rm -f home-dashboard
 
 docker run -d \
@@ -94,7 +94,7 @@ docker run -d \
   --restart unless-stopped \
   -p 8080:80 \
   -v "$(pwd)/conf.yml:/etc/docker-tools/conf.yml:ro" \
-  yangbao93/home-dashboard:latest
+  ghcr.io/runtime-excpetion/home-dashboard:latest
 ```
 
 ### 使用 Docker Compose
@@ -106,7 +106,7 @@ name: home-dashboard
 
 services:
   home-dashboard:
-    image: yangbao93/home-dashboard:latest
+    image: ghcr.io/runtime-excpetion/home-dashboard:latest
     container_name: home-dashboard
     restart: unless-stopped
     ports:
