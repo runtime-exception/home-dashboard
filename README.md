@@ -64,6 +64,11 @@ DASHBOARD_PORT=9000 docker compose up -d --build
 - `1.0.0`：固定版本
 - 支持 `linux/amd64` 和 `linux/arm64`
 
+仓库中的 Docker workflow 会在推送到 `main` 分支或推送 `v*` 标签时，自动构建并发布上述两个平台的镜像。运行前需要在 GitHub 仓库的 Actions secrets 中配置：
+
+- `DOCKERHUB_USERNAME`：Docker Hub 用户名
+- `DOCKERHUB_TOKEN`：具有镜像写入权限的 Docker Hub access token
+
 部署前请准备好自定义的 `conf.yml`。可以复制本仓库中的示例配置，再将其中的 IP、端口、域名和图标地址替换为自己的服务地址。
 
 ### 使用 Docker 命令
