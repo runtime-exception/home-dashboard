@@ -2,6 +2,20 @@
 .env
 *.local
 *.log
+
 frontend/node_modules/
 frontend/dist/
 frontend/*.tsbuildinfo
+
+api/node_modules/
+api/dist/
+api/*.tsbuildinfo
+
+# 备份目录。config/conf.yml 是配置真源，需要入库，不要忽略
+data/
+
+# 本地 agent 记忆与工作日志
+.workbuddy/
+
+# 本地私密备注、凭据等，一律不入库
+*.local

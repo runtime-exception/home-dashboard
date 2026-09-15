@@ -1,6 +1,16 @@
 .git
 .gitignore
+.github
+.workbuddy
+docs
+
 frontend/node_modules
 frontend/dist
+api/node_modules
+api/dist
+api/test
+
+data
+
 **/.DS_Store
 *.log

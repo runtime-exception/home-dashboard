@@ -1,0 +1,212 @@
+version: 3
+
+dashboard:
+  title: Tools Center
+  description: 统一管理和访问个人部署工具
+  adminEntry: false
+
+search:
+  defaultEngine: bing
+  engines:
+    - id: baidu
+      name: 百度
+      urlTemplate: https://www.baidu.com/s?wd={query}
+      enabled: true
+    - id: bing
+      name: 必应
+      urlTemplate: https://www.bing.com/search?q={query}
+      enabled: true
+    - id: google
+      name: Google
+      urlTemplate: https://www.google.com/search?q={query}
+      enabled: true
+
+networkTest:
+  ip: 192.168.28.30
+  port: 8019
+  protocol: http
+  timeoutMs: 3000
+
+# 标签注册表：工具的 tags 字段引用这里的 id。
+# id 一经使用尽量不要修改，改名只改 label 即可。
+tags:
+  - id: docs
+    label: 文档处理
+  - id: media
+    label: 影音媒体
+  - id: devops
+    label: 运维部署
+  - id: ai
+    label: AI 工具
+  - id: storage
+    label: 文件存储
+  - id: notes
+    label: 笔记知识
+
+tools:
+  - id: pdf
+    title: PDF Tools
+    description: PDF 合并、拆分、压缩与格式转换，一站式处理常用文档任务。
+    icon: http://192.168.28.30:8019/images/favicon.svg
+    internalUrl: http://192.168.28.30:8019
+    publicUrl: https://pdf.pixellife.fun
+    accent: "#f06b78"
+    enabled: true
+    tags:
+      - docs
+
+  - id: converter
+    title: ConvertX
+    description: 快速转换图片、文档、音视频等多种文件格式。
+    icon: http://192.168.28.30:8020/favicon-32x32.png
+    internalUrl: http://192.168.28.30:8020
+    publicUrl: https://convert.pixellife.fun
+    accent: "#f0b44e"
+    enabled: true
+    remark: "账号 875674770@qq.com"
+    tags:
+      - docs
+
+  - id: omnitools
+    title: Omnitools
+    description: 面向日常开发和办公场景的在线工具集合。
+    icon: http://192.168.28.30:3060/favicon.svg
+    internalUrl: http://192.168.28.30:3060
+    publicUrl: https://omni.pixellife.fun
+    accent: "#5f86ff"
+    enabled: true
+    tags:
+      - docs
+
+  - id: lama
+    title: Lama Cleaner
+    description: 使用 AI 快速移除图片对象、修复瑕疵并智能补全背景。
+    icon: http://192.168.28.30:8980/favicon.ico
+    internalUrl: http://192.168.28.30:8980
+    publicUrl: ""
+    accent: "#19c9aa"
+    enabled: true
+    tags:
+      - ai
+      - media
+
+  - id: filecodebox
+    title: FileCodeBox
+    description: 通过取件码快速分享和传输文件，适合跨设备临时交换资料。
+    icon: http://192.168.28.30:8017/assets/logo_small.png
+    internalUrl: http://192.168.28.30:8017
+    publicUrl: https://trans.pixellife.fun
+    accent: "#a978ff"
+    enabled: true
+    tags:
+      - storage
+
+  - id: music-scraper
+    title: MusicScraper
+    description: 音乐资源检索与采集工具，集中处理音乐内容获取任务。
+    icon: http://192.168.28.30:8018/favicon.ico
+    internalUrl: http://192.168.28.30:8018
+    publicUrl: https://music-scraper.pixellife.fun
+    accent: "#ec4899"
+    enabled: true
+    tags:
+      - media
+
+  - id: navidrome
+    title: Navidrome
+    description: 自托管音乐流媒体服务，随时访问和播放个人音乐库。
+    icon: http://192.168.28.30:8014/app/assets/android-icon-192x192-D_ka5daf.png
+    internalUrl: http://192.168.28.30:8014
+    publicUrl: https://music.pixellife.fun
+    accent: "#ef4444"
+    enabled: true
+    tags:
+      - media
+
+  - id: lucky
+    title: Lucky
+    description: 网络运维工具，提供动态域名、端口转发和反向代理等能力。
+    icon: http://192.168.28.30:16601/logo.svg
+    internalUrl: http://192.168.28.30:16601
+    publicUrl: https://lucky.pixellife.fun
+    accent: "#22c55e"
+    enabled: true
+    tags:
+      - devops
+
+  - id: siyuan
+    title: 思源笔记
+    description: 隐私优先的个人知识管理与双向链接笔记软件。
+    icon: http://192.168.28.30:8013/favicon.ico
+    internalUrl: http://192.168.28.30:8013
+    publicUrl: https://note.pixellife.fun
+    accent: "#d97706"
+    enabled: true
+    tags:
+      - notes
+
+  - id: 1panel
+    title: 1Panel
+    description: 现代化 Linux 服务器运维管理面板。
+    icon: http://192.168.28.30:18090/public/favicon.png
+    internalUrl: http://192.168.28.30:18090
+    publicUrl: https://1panel.pixellife.fun
+    accent: "#14b8a6"
+    enabled: true
+    tags:
+      - devops
+
+  - id: dpanel
+    title: DPanel 面板
+    description: 轻量化 Docker 容器、镜像和 Compose 项目管理面板。
+    icon: http://192.168.28.30:10003/favicon.ico
+    internalUrl: http://192.168.28.30:10003
+    publicUrl: https://dpanel.pixellife.fun
+    accent: "#3b82f6"
+    enabled: false
+    tags:
+      - devops
+
+  - id: magic-resume
+    title: Magic-Resume
+    description: 简历创建、编辑与管理工具，快速生成专业简历。
+    icon: http://192.168.28.30:8028/logo.svg
+    internalUrl: http://192.168.28.30:8028
+    publicUrl: https://resume.pixellife.fun
+    accent: "#8b5cf6"
+    enabled: true
+    tags:
+      - docs
+
+  - id: octopus
+    title: Octopus
+    description: AI 服务工作台，集中访问智能应用与相关能力。
+    icon: http://192.168.28.30:8029/favicon.ico
+    internalUrl: http://10.126.126.6:18080
+    publicUrl: https://ai.pixellife.fun
+    accent: "#06b6d4"
+    enabled: true
+    tags:
+      - ai
+
+  - id: litepan
+    title: LitePan
+    description: 轻量文件存储与网盘服务，便捷管理和分享文件。
+    icon: http://192.168.28.30:5211/favicon.ico
+    internalUrl: http://192.168.28.30:5211
+    publicUrl: https://litepan.pixellife.fun
+    accent: "#6366f1"
+    enabled: true
+    tags:
+      - storage
+
+  - id: dockerports
+    title: Docker Ports
+    description: Docker 容器端口映射管理工具
+    icon: http://192.168.28.30:7577/favicon.ico
+    internalUrl: http://192.168.28.30:7577
+    publicUrl: https://ports.pixellife.fun
+    accent: "#a978ff"
+    enabled: true
+    tags:
+      - devops

@@ -8,12 +8,44 @@ services:
     restart: unless-stopped
     ports:
       - "${DASHBOARD_PORT:-8080}:80"
-    volumes:
-      - ./conf.yml:/etc/docker-tools/conf.yml:ro
+    depends_on:
+      api:
+        condition: service_started
     networks:
       - tools-network
     healthcheck:
       test: ["CMD", "wget", "-q", "--spider", "http://127.0.0.1/healthz"]
+      interval: 30s
+      timeout: 3s
+      retries: 3
+      start_period: 5s
+
+  api:
+    build:
+      context: .
+      dockerfile: api/Dockerfile
+    restart: unless-stopped
+    # 以宿主机用户身份运行，写入 conf.yml 与备份后文件属主不会变成 root。
+    # 首次部署前请先执行：mkdir -p data
+    user: "${UID:-1000}:${GID:-1000}"
+    environment:
+      # :? 语法让变量缺失时 compose 直接报错，避免出现空凭据的裸奔实例。
+      # 凭据只从 .env（或 shell 环境）读取，绝不要在文件里写死默认值。
+      ADMIN_USERNAME: "${ADMIN_USERNAME:?缺少 ADMIN_USERNAME，请在 .env 中设置}"
+      ADMIN_TOKEN: "${ADMIN_TOKEN:?缺少 ADMIN_TOKEN，请在 .env 中设置（至少 16 位）}"
+      SESSION_TTL_HOURS: "${SESSION_TTL_HOURS:-8}"
+      CONFIG_FILE: /etc/docker-tools/conf.yml
+      BACKUP_DIR: /data/backups
+    volumes:
+      # 挂目录而不是挂单个文件：单文件 bind mount 会把 inode 钉住，
+      # 导致容器内 rename 失败（原子写不可用），且宿主机换 inode 的编辑器改动看不到
+      - ./config:/etc/docker-tools:rw
+      - ./data:/data:rw
+    networks:
+      - tools-network
+    # 刻意不映射端口：只通过 compose 内网被 nginx 访问
+    healthcheck:
+      test: ["CMD", "wget", "-q", "--spider", "http://127.0.0.1:3000/healthz"]
       interval: 30s
       timeout: 3s
       retries: 3
