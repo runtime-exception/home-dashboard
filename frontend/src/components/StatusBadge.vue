@@ -9,7 +9,7 @@ const labels: Record<ToolStatus, string> = {
   checking: '检测中',
   online: '在线',
   offline: '离线',
-  disabled: '离线',
+  disabled: '未启用',
 }
 </script>
 

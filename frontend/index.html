@@ -2,8 +2,22 @@
 <html lang="zh-CN">
   <head>
     <meta charset="UTF-8" />
+    <!-- 必须在任何样式生效前定主题，否则深色模式会闪一下白底 -->
+    <script>
+      (function () {
+        try {
+          var saved = localStorage.getItem('dashboard-theme')
+          var dark = saved
+            ? saved === 'dark'
+            : window.matchMedia('(prefers-color-scheme: dark)').matches
+          document.documentElement.dataset.theme = dark ? 'dark' : 'light'
+        } catch (error) {
+          document.documentElement.dataset.theme = 'light'
+        }
+      })()
+    </script>
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <meta name="theme-color" content="#07111f" />
+    <meta name="color-scheme" content="light dark" />
     <meta name="description" content="统一管理和访问个人部署工具" />
     <title>Tools Center</title>
   </head>
