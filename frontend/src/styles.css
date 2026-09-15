@@ -1376,6 +1376,78 @@ a {
   grid-column: 1 / -1;
 }
 
+/* 字段内横排：输入框 + 缩略图 + 操作按钮。输入框占满剩余宽度。 */
+.field__row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.field__row--tight {
+  gap: 6px;
+}
+
+.icon-preview {
+  flex: 0 0 auto;
+  width: 22px;
+  height: 22px;
+  object-fit: contain;
+  border-radius: 5px;
+}
+
+.button--compact {
+  flex: 0 0 auto;
+  height: 36px;
+  padding: 0 12px;
+  font-size: 13px;
+  white-space: nowrap;
+}
+
+/* ── 强调色取色器 ───────────────────────────────────────── */
+.accent-field {
+  gap: 8px;
+}
+
+.accent-hex {
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  max-width: 150px;
+}
+
+/* 覆盖 .field input 的 width:100% 与内边距：原生取色器要的是正方形色块 */
+.field input[type='color'] {
+  flex: 0 0 auto;
+  width: 36px;
+  height: 36px;
+  padding: 3px;
+  border-radius: var(--radius-sm);
+  background: var(--surface);
+  cursor: pointer;
+}
+
+.accent-presets {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.accent-presets__item {
+  width: 20px;
+  height: 20px;
+  padding: 0;
+  border: 1px solid var(--line-strong);
+  border-radius: 50%;
+  cursor: pointer;
+  transition: transform 140ms var(--ease);
+}
+
+.accent-presets__item:hover {
+  transform: scale(1.18);
+}
+
+.accent-presets__item.is-active {
+  box-shadow: 0 0 0 2px var(--surface-2), 0 0 0 3.5px var(--text);
+}
+
 .tag-picker {
   display: flex;
   flex-wrap: wrap;

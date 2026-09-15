@@ -1,7 +1,7 @@
 <script setup lang="ts">
-import { LoaderCircle, Save, X } from '@lucide/vue'
-import { computed, reactive } from 'vue'
-import type { FieldError } from '../../services/admin'
+import { LoaderCircle, Save, WandSparkles, X } from '@lucide/vue'
+import { computed, reactive, ref, useId } from 'vue'
+import { AdminApiError, adminApi, type FieldError } from '../../services/admin'
 import type { TagConfig, ToolConfig } from '../../types/tool'
 
 const props = defineProps<{
@@ -65,6 +65,93 @@ function toggleTag(id: string) {
   else draft.tags.splice(index, 1)
 }
 
+// ── 强调色 ───────────────────────────────────────────────────
+const accentId = useId()
+const iconId = useId()
+
+/** schema 只认 #RRGGBB，其它一律当作没设置。 */
+const HEX_RE = /^#[0-9a-fA-F]{6}$/
+/** 与 styles.css 的 --accent（浅色主题）保持一致。 */
+const DEFAULT_ACCENT = '#0071e3'
+
+/** 预设色板：取自门户里已经在用的强调色，新工具能直接和既有卡片保持同一套视觉。 */
+const ACCENT_PRESETS = [
+  '#f06b78',
+  '#f0b44e',
+  '#5f86ff',
+  '#19c9aa',
+  '#a978ff',
+  '#ec4899',
+  '#ef4444',
+  '#22c55e',
+  '#d97706',
+  '#14b8a6',
+  '#3b82f6',
+  '#8b5cf6',
+  '#06b6d4',
+  '#6366f1',
+]
+
+/**
+ * accent 是可选字段。文本输入框清空时要落成 undefined 而不是空串——
+ * 空串不匹配 #RRGGBB，会被后端 schema 打回。
+ */
+const accentText = computed({
+  get: () => draft.accent ?? '',
+  set: (value: string) => {
+    const trimmed = value.trim()
+    draft.accent = trimmed === '' ? undefined : trimmed
+  },
+})
+
+/** 原生取色器只接受 #rrggbb；accent 为空或只敲了一半时先显示默认色。 */
+const accentSwatch = computed({
+  get: () => (HEX_RE.test(draft.accent ?? '') ? (draft.accent as string) : DEFAULT_ACCENT),
+  set: (value: string) => {
+    draft.accent = value
+  },
+})
+
+// ── 图标自动获取 ─────────────────────────────────────────────
+const iconProbing = ref(false)
+const iconNotice = ref('')
+
+/**
+ * 优先用公网地址：解析出来的图标多半是公网绝对地址，配到别的机器上也能显示。
+ * 没填公网地址才回落到内网地址。
+ */
+const iconProbeSource = computed(() => {
+  const publicUrl = draft.publicUrl?.trim()
+  if (publicUrl) return { url: publicUrl, label: '公网地址' }
+  const internalUrl = draft.internalUrl?.trim()
+  if (internalUrl) return { url: internalUrl, label: '内网地址' }
+  return { url: '', label: '' }
+})
+
+async function probeIcon() {
+  const source = iconProbeSource.value
+  if (!source.url || iconProbing.value) return
+
+  iconProbing.value = true
+  iconNotice.value = ''
+  try {
+    const result = await adminApi.tools.probeIcon(source.url)
+    if (result.ok && result.icon) {
+      draft.icon = result.icon
+      iconNotice.value =
+        result.source === 'fallback'
+          ? `已从${source.label}取到 /favicon.ico`
+          : `已从${source.label}的页面里取到图标`
+    } else {
+      iconNotice.value = result.message ?? '没能从该地址找到图标'
+    }
+  } catch (error) {
+    iconNotice.value = error instanceof AdminApiError ? error.message : '获取图标失败'
+  } finally {
+    iconProbing.value = false
+  }
+}
+
 function submit() {
   emit('submit', { ...draft, tags: [...draft.tags] })
 }
@@ -98,11 +185,35 @@ function submit() {
         <small v-for="m in errorsFor('description')" :key="m" class="field__error">{{ m }}</small>
       </label>
 
-      <label class="field field--wide">
-        <span class="field__label">图标地址</span>
-        <input v-model="draft.icon" type="text" placeholder="https://… 或 /assets/x.svg" />
+      <div class="field field--wide">
+        <label class="field__label" :for="iconId">图标地址</label>
+        <span class="field__row">
+          <img v-if="draft.icon" :src="draft.icon" alt="" class="icon-preview" />
+          <input
+            :id="iconId"
+            v-model="draft.icon"
+            type="text"
+            placeholder="https://… 或 /assets/x.svg"
+          />
+          <button
+            class="button button--compact"
+            type="button"
+            :disabled="saving || iconProbing || !iconProbeSource.url"
+            :title="
+              iconProbeSource.url
+                ? `从${iconProbeSource.label}抓取页面并推断图标地址`
+                : '先填内网地址或公网地址'
+            "
+            @click="probeIcon"
+          >
+            <LoaderCircle v-if="iconProbing" class="spinning" :size="15" aria-hidden="true" />
+            <WandSparkles v-else :size="15" aria-hidden="true" />
+            自动获取
+          </button>
+        </span>
+        <small v-if="iconNotice" class="field__hint">{{ iconNotice }}</small>
         <small v-for="m in errorsFor('icon')" :key="m" class="field__error">{{ m }}</small>
-      </label>
+      </div>
 
       <label class="field field--wide">
         <span class="field__label">内网地址</span>
@@ -116,11 +227,36 @@ function submit() {
         <small v-for="m in errorsFor('publicUrl')" :key="m" class="field__error">{{ m }}</small>
       </label>
 
-      <label class="field">
-        <span class="field__label">强调色</span>
-        <input v-model="draft.accent" type="text" placeholder="#RRGGBB" />
+      <div class="field field--wide accent-field">
+        <label class="field__label" :for="accentId">强调色</label>
+        <span class="field__row field__row--tight">
+          <input
+            :id="accentId"
+            v-model="accentText"
+            type="text"
+            class="accent-hex"
+            placeholder="#RRGGBB"
+            maxlength="7"
+            spellcheck="false"
+          />
+          <input v-model="accentSwatch" type="color" class="accent-native" aria-label="选择强调色" />
+        </span>
+        <span class="accent-presets">
+          <button
+            v-for="color in ACCENT_PRESETS"
+            :key="color"
+            class="accent-presets__item"
+            :class="{ 'is-active': (draft.accent ?? '').toLowerCase() === color }"
+            :style="{ background: color }"
+            type="button"
+            :title="color"
+            :aria-label="`使用强调色 ${color}`"
+            @click="draft.accent = color"
+          />
+        </span>
+        <small class="field__hint">留空表示不设强调色，卡片会使用默认色。</small>
         <small v-for="m in errorsFor('accent')" :key="m" class="field__error">{{ m }}</small>
-      </label>
+      </div>
 
       <label class="switch-row switch-row--compact">
         <span><strong>启用</strong></span>

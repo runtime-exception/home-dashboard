@@ -18,6 +18,15 @@ export interface BackupInfo {
   modifiedAt: string
 }
 
+/** 从工具地址推断图标的结果。ok=false 是「没找到」，不是请求失败。 */
+export interface IconProbeResult {
+  ok: boolean
+  icon?: string
+  /** 图标是从哪来的：页面 link 标签、web app manifest，还是回落的 /favicon.ico。 */
+  source?: 'link' | 'manifest' | 'fallback'
+  message?: string
+}
+
 interface ApiErrorBody {
   error?: { code?: string; message?: string; details?: FieldError[] }
 }
@@ -151,6 +160,16 @@ export const adminApi = {
       request<AdminEnvelope>('/api/admin/tools/reorder', {
         method: 'PATCH',
         body: JSON.stringify({ ids }),
+      }),
+
+    /**
+     * 让服务端去抓目标页面，从 <link rel="icon"> / manifest 里推断图标地址。
+     * 放在服务端做是因为浏览器读不到跨域页面的 HTML。
+     */
+    probeIcon: (url: string) =>
+      request<IconProbeResult>('/api/admin/icon-probe', {
+        method: 'POST',
+        body: JSON.stringify({ url }),
       }),
   },
 
