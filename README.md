@@ -215,6 +215,7 @@ tools:
 | 字段 | 说明 |
 |---|---|
 | `defaultEngine` | 首页首次打开时选中的启用引擎 id |
+| `openInNewTab` | 搜索结果是否在新标签页打开；默认 `true`。设为 `false` 则在当前页面打开（浏览器后退键可回到门户） |
 | `engines[].id` | 唯一标识，小写字母、数字和连字符；创建后不可修改 |
 | `engines[].name` | 首页选择器中显示的名称，最多 24 个字符 |
 | `engines[].urlTemplate` | `http/https` 搜索地址，必须且只能包含一个 `{query}` |

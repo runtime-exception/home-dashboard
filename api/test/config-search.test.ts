@@ -19,6 +19,17 @@ assert.deepEqual(
   migrated.search.engines.map((engine) => engine.id),
   ['baidu', 'bing', 'google'],
 )
+// openInNewTab 是老配置里没有的新字段：默认必须是 true，
+// 否则升级后所有用户的搜索跳转方式都会被悄悄改掉。
+assert.equal(migrated.search.openInNewTab, true)
+assert.equal(
+  configSchema.safeParse({ ...migrated, search: { ...migrated.search, openInNewTab: false } }).success,
+  true,
+)
+assert.equal(
+  configSchema.safeParse({ ...migrated, search: { ...migrated.search, openInNewTab: 'yes' } }).success,
+  false,
+)
 
 function rejects(search: typeof migrated.search) {
   assert.equal(configSchema.safeParse({ ...migrated, search }).success, false)

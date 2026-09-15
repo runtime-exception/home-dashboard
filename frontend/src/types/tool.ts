@@ -26,6 +26,8 @@ export interface SearchEngineConfig {
 export interface SearchConfig {
   defaultEngine: string
   engines: SearchEngineConfig[]
+  /** 搜索结果在新标签页打开；false 表示在当前页面打开。 */
+  openInNewTab: boolean
 }
 
 /** 标签注册表条目。order 由 api 按数组下标注入，磁盘上不存这个字段。 */

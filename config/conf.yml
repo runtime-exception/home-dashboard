@@ -7,6 +7,8 @@ dashboard:
 
 search:
   defaultEngine: bing
+  # 搜索结果是否在新标签页打开。设为 false 则在当前页面打开（浏览器后退键可回到门户）。
+  openInNewTab: true
   engines:
     - id: baidu
       name: 百度

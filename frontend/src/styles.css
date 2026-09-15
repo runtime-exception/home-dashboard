@@ -1350,6 +1350,14 @@ a {
   white-space: nowrap;
 }
 
+/* 搜索结果打开方式：一个勾选框 + 一行说明 */
+.search-open-mode {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 4px 12px;
+}
+
 .search-engine-option input {
   accent-color: var(--accent);
 }

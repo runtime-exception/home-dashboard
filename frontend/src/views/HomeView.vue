@@ -122,11 +122,21 @@ function showNotice(message: string) {
   }, 2800)
 }
 
+/** 搜索结果是否在新标签页打开；配置里没有这个字段时按 true 处理，与旧行为一致。 */
+const searchInNewTab = computed(() => searchConfig.value?.openInNewTab ?? true)
+
 function searchWeb() {
   const engine = selectedEngine.value
   const keyword = webQuery.value.trim()
   if (!engine || !keyword) return
-  window.open(buildSearchUrl(engine.urlTemplate, keyword), '_blank', 'noopener,noreferrer')
+
+  const url = buildSearchUrl(engine.urlTemplate, keyword)
+  if (searchInNewTab.value) {
+    window.open(url, '_blank', 'noopener,noreferrer')
+  } else {
+    // 同页打开。用 assign 而不是 replace，这样浏览器后退键能回到门户
+    window.location.assign(url)
+  }
 }
 
 /**

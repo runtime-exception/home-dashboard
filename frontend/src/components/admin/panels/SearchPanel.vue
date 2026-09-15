@@ -5,7 +5,7 @@ import { useConfigStore } from '../../../stores/config'
 import type { SearchConfig, SearchEngineConfig } from '../../../types/tool'
 
 const config = useConfigStore()
-const draft = ref<SearchConfig>({ defaultEngine: '', engines: [] })
+const draft = ref<SearchConfig>({ defaultEngine: '', engines: [], openInNewTab: true })
 const newEngine = ref<SearchEngineConfig>({
   id: '',
   name: '',
@@ -20,6 +20,7 @@ watch(
       draft.value = {
         defaultEngine: value.defaultEngine,
         engines: value.engines.map((engine) => ({ ...engine })),
+        openInNewTab: value.openInNewTab,
       }
     }
   },
@@ -55,6 +56,7 @@ async function save() {
     ...current,
     search: {
       defaultEngine: draft.value.defaultEngine,
+      openInNewTab: draft.value.openInNewTab,
       engines: draft.value.engines.map((engine) => ({
         ...engine,
         name: engine.name.trim(),
@@ -73,6 +75,20 @@ async function save() {
         <p>首页只展示启用项，地址模板必须包含一个 <code>{query}</code>。</p>
       </div>
     </div>
+
+    <section class="panel">
+      <div class="panel__body">
+        <div class="search-open-mode">
+          <label class="search-engine-option">
+            <input v-model="draft.openInNewTab" type="checkbox" />
+            搜索结果在新标签页打开
+          </label>
+          <span class="field__hint">
+            关掉则在当前页面打开，浏览器后退键可以回到门户。工具卡片的打开方式不受这项影响。
+          </span>
+        </div>
+      </div>
+    </section>
 
     <section class="panel">
       <div class="panel__body">

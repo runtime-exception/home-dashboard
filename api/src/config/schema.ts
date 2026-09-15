@@ -124,6 +124,11 @@ export const configSchema = z
     search: z.looseObject({
       defaultEngine: z.string({ error: '默认搜索引擎必须是字符串' }),
       engines: z.array(searchEngineSchema).min(1, '至少需要配置一个搜索引擎'),
+      /**
+       * 搜索结果是否在新标签页打开。
+       * 默认 true —— 与加这个开关之前的行为一致，老配置升级后跳转方式不会变。
+       */
+      openInNewTab: z.boolean({ error: '打开方式必须是 true 或 false' }).default(true),
     }),
     networkTest: z.looseObject({
       ip: z.string({ error: '探测地址必须是字符串' }).min(1, '内网探测地址不能为空'),
