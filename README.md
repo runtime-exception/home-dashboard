@@ -23,25 +23,41 @@
 
 ## 架构
 
-两个容器，职责单一：
+一个容器里跑两个进程：NGINX 负责静态资源与反向代理，Node + Fastify 负责配置服务。
+两者由 `docker/entrypoint.sh` 监督——任一进程退出就结束容器，交给 compose 的 `restart` 策略重新拉起。
 
 ```text
 浏览器
   │
   ▼
-nginx 容器（80）              静态资源 + 反向代理
-  ├── /                     → 打包好的前端（hash 路由，无需 SPA fallback）
-  ├── /api/config.json      ┐
-  ├── /api/health           ├─→ api 容器（3000，不对外映射端口）
-  └── /api/admin/*          ┘
-                                ├── 读：内存中的配置对象 → JSON
-                                └── 写：目录挂载 → 原子写 conf.yml + 备份
+容器（对外只发布 80）
+  │
+  ├── nginx（80）           静态资源 + 反向代理
+  │     ├── /                  → 打包好的前端（hash 路由，无需 SPA fallback）
+  │     ├── /healthz           → nginx 自身存活
+  │     └── /api/*             ┐
+  │                             │  代理到本机回环
+  └── node（3000，仅回环）   ◄──┘
+        ├── 读：内存中的配置对象 → JSON
+        └── 写：目录挂载 → 原子写 conf.yml + 备份
 ```
 
 - **`conf.yml` 是唯一真源。** `/api/config.json` 只是 URL 路径，由 api 在内存中即时序列化，磁盘上不存在这个文件，因此不会出现「YAML 与 JSON 两份状态不一致」。
 - 配置目录以**目录**方式挂载（`./config:/etc/docker-tools`）。挂单文件会把 inode 钉住，容器内的原子写（tmp → rename）会失败。
 - 写入采用 `fsync(file) → rename → fsync(dir)`，宿主机上的编辑器和容器内进程不会读到写了一半的文件。
-- `nginx` 用变量式 `proxy_pass` + Docker 内置 DNS 运行时解析，api 未就绪时 nginx 依然能启动。
+- api 只监听 `127.0.0.1:3000`，端口不对外发布；即使容器网络里还有别的容器也连不上它。
+- **为什么不拆成两个容器**：部署只要一个镜像、一个容器、一个端口，不用做服务发现，也不用维护两套镜像 tag。代价是两个进程共用一个容器，所以进程监督是必需的——少了它，api 挂掉后容器依然算 healthy，用户只会看到一片 502。
+- `nginx.conf` 里保留变量式 `proxy_pass`，上游写成本机回环地址。compose 仍然建了自定义网络：`resolver 127.0.0.11` 是 Docker 内置 DNS，只在自定义网络里存在。
+
+## 两种部署方式
+
+| 文件 | 镜像来源 | 适用场景 |
+| --- | --- | --- |
+| `docker-compose.yml` | 本机构建（`build:` → 根目录 `Dockerfile`） | 开发、改完代码立刻验证 |
+| `docker-compose.image.yml` | 拉取 CI 构建好的镜像（`image:`） | 部署到服务器 / NAS，机器上不需要 Node 和源码 |
+
+两个文件的服务名、端口、挂载完全一致，只是镜像来源不同，可以按需切换。
+CI 每次 push 到 `main` 会把镜像推到 GHCR：`ghcr.io/runtime-exception/home-dashboard:latest`（包是 public，pull 不需要登录）。
 
 ## 项目结构
 
@@ -58,8 +74,7 @@ home-dashboard/
 │   │   ├── config/                # schema / 迁移 / 原子写 / 备份 / YAML 读写
 │   │   ├── health/                # 探测与聚合快照
 │   │   └── routes/                # session / admin / public
-│   ├── test/
-│   └── Dockerfile
+│   └── test/
 ├── frontend/                      # Vue 3 + Vite
 │   └── src/
 │       ├── components/
@@ -70,10 +85,14 @@ home-dashboard/
 │       ├── views/                 # HomeView / AdminView
 │       └── styles.css
 ├── nginx/
-│   ├── Dockerfile                 # 多阶段：构建前端 → 拷进 nginx 镜像
-│   └── nginx.conf
+│   └── nginx.conf                 # 静态资源 + 反向代理；合并镜像时只替换上游地址
+├── docker/
+│   └── entrypoint.sh              # 监督 nginx 与 api 两个进程，任一退出即结束容器
+├── Dockerfile                     # 单镜像：前端构建 → api 构建 → nginx + node 运行时
+├── docker-compose.yml             # 本机构建版
+├── docker-compose.image.yml       # 镜像部署版（拉 CI 构建好的镜像）
 ├── docs/design-console-and-refresh.html
-└── docker-compose.yml
+└── .github/workflows/docker.yml   # 构建并推送镜像到 GHCR
 ```
 
 ## 快速启动
@@ -105,7 +124,7 @@ home-dashboard/
 DASHBOARD_PORT=9000 docker compose up -d --build
 ```
 
-> `api` 以 `${UID}:${GID}` 身份运行，这样容器写出来的 `conf.yml` 和备份属主还是你，不会变成 root。macOS 上通常不需要额外设置。
+> api 进程以 `APP_UID`/`APP_GID` 身份运行（默认取宿主机的 `${UID}`/`${GID}`，取不到就回落到 `1000:1000`），这样容器写出来的 `conf.yml` 和备份属主还是你，不会变成 root。nginx 仍以 root 启动，因为它需要绑定 80 端口。macOS 上通常不需要额外设置。
 
 ## 控制台
 
@@ -307,7 +326,19 @@ cd frontend && npx vue-tsc -p tsconfig.app.json
 3. 旧的 `conf.yml` 不需要手工加 `version`——api 启动时会自动迁移到 v3 并补齐缺省字段，标签注册表可以先留空，之后在控制台里加。
 4. `docker compose up -d --build` 重建。
 
-`jq` / `yq` / `generate-config.sh` 这套已全部移除，配置解析与健康检查都归 api 容器。
+`jq` / `yq` / `generate-config.sh` 这套已全部移除，配置解析与健康检查都归 api 进程。
+
+### 从「nginx + api 双容器」版本升级
+
+镜像已合并成单容器，服务名从 `nginx` / `api` 变成一个 `app`，重建时容器名会变，所以先 down 再 up：
+
+```bash
+docker compose down          # 只移除容器与网络
+docker compose up -d --build
+```
+
+`config/` 与 `data/` 是**目录挂载**，不是 compose 管理的卷，`down` 不会动它们，配置和备份都还在。
+旧的两个镜像（`docker-tools-dashboard-nginx` / `docker-tools-dashboard-api`）不再被引用，可以自行 `docker image rm` 清理。
 
 ## HTTPS 注意事项
 
