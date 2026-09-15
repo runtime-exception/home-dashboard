@@ -86,7 +86,7 @@ home-dashboard/
    openssl rand -base64 24
    ```
 
-   `ADMIN_TOKEN` 少于 16 个字符时 api 会拒绝启动，这是刻意的。
+   `ADMIN_TOKEN` 少于 8 个字符时 api 会拒绝启动。这只是兜底下限，不是强度保证——请用上面的命令生成，不要手写弱口令。
 
    > 凭据只从 `.env`（或 shell 环境）读取，compose 里没有写死默认值。两项缺任一项 `docker compose` 会**在启动容器之前**直接报错，避免跑出一个空凭据的实例。
 

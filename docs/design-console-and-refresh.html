@@ -580,7 +580,8 @@ services:
   <h3>启动时校验</h3>
   <ul>
     <li>任一环境变量缺失或为空 → <strong>拒绝启动</strong>，日志打印明确的修复指引。</li>
-    <li><code>ADMIN_TOKEN</code> 长度小于 16 字符 → 拒绝启动。宁可让用户改一次配置，也不要接受 <code>123456</code>。</li>
+    <li><code>ADMIN_TOKEN</code> 长度小于 8 字符 → 拒绝启动。宁可让用户改一次配置，也不要接受 <code>123456</code>。</li>
+    <li>下限最初定为 16，2026-09-15 放宽到 8。8 只是兜底，不构成强度保证，仍建议用 <code>openssl rand -base64 24</code> 生成。</li>
     <li>启动日志里只输出令牌长度与指纹前缀，不输出原文。</li>
   </ul>
 

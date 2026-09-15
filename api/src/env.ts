@@ -11,8 +11,13 @@ export interface AppEnv {
   host: string
 }
 
-/** 令牌最小长度。低于此值拒绝启动，避免出现 123456 这类凭据。 */
-export const MIN_TOKEN_LENGTH = 16
+/**
+ * 令牌最小长度。低于此值拒绝启动。
+ *
+ * 注意这是兜底下限，不是强度保证：8 位的 `12345678` 同样能通过。
+ * 真正的强度取决于生成方式，请用 `openssl rand -base64 24` 生成。
+ */
+export const MIN_TOKEN_LENGTH = 8
 
 const DEFAULT_CONFIG_FILE = '/etc/docker-tools/conf.yml'
 const DEFAULT_BACKUP_DIR = '/data/backups'

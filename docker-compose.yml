@@ -32,7 +32,7 @@ services:
       # :? 语法让变量缺失时 compose 直接报错，避免出现空凭据的裸奔实例。
       # 凭据只从 .env（或 shell 环境）读取，绝不要在文件里写死默认值。
       ADMIN_USERNAME: "${ADMIN_USERNAME:?缺少 ADMIN_USERNAME，请在 .env 中设置}"
-      ADMIN_TOKEN: "${ADMIN_TOKEN:?缺少 ADMIN_TOKEN，请在 .env 中设置（至少 16 位）}"
+      ADMIN_TOKEN: "${ADMIN_TOKEN:?缺少 ADMIN_TOKEN，请在 .env 中设置（至少 8 位）}"
       SESSION_TTL_HOURS: "${SESSION_TTL_HOURS:-8}"
       CONFIG_FILE: /etc/docker-tools/conf.yml
       BACKUP_DIR: /data/backups
