@@ -18,7 +18,7 @@ concurrency:
 
 env:
   REGISTRY: ghcr.io
-  IMAGE_NAME: runtime-excpetion/home-dashboard
+  IMAGE_NAME: runtime-exception/home-dashboard
 
 jobs:
   publish:
