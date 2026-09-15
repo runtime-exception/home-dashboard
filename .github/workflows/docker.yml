@@ -18,26 +18,13 @@ concurrency:
 
 env:
   REGISTRY: ghcr.io
+  # nginx 与 api 合并成单镜像后，一个包一个镜像，不再需要 -api 后缀来区分
   IMAGE_NAME: runtime-exception/home-dashboard
 
 jobs:
   publish:
-    name: Publish ${{ matrix.name }} image
+    name: Publish image
     runs-on: ubuntu-latest
-
-    strategy:
-      # 两个镜像互不依赖，一个失败不要连坐取消另一个
-      fail-fast: false
-      matrix:
-        include:
-          # web：NGINX + 打包好的前端静态文件
-          - name: web
-            file: ./nginx/Dockerfile
-            suffix: ""
-          # api：Fastify 配置服务，web 容器通过 compose 内网访问它
-          - name: api
-            file: ./api/Dockerfile
-            suffix: "-api"
 
     steps:
       - name: Checkout repository
@@ -61,9 +48,6 @@ jobs:
         uses: docker/metadata-action@v5
         with:
           images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
-          # api 镜像的标签统一加 -api 后缀：latest-api / 1.0.0-api
-          flavor: |
-            suffix=${{ matrix.suffix }}
           tags: |
             type=ref,event=branch
             type=semver,pattern={{version}}
@@ -75,10 +59,10 @@ jobs:
         uses: docker/build-push-action@v6
         with:
           context: .
-          file: ${{ matrix.file }}
+          file: ./Dockerfile
           platforms: linux/amd64,linux/arm64
           push: true
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
-          cache-from: type=gha,scope=${{ matrix.name }}
-          cache-to: type=gha,mode=max,scope=${{ matrix.name }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max

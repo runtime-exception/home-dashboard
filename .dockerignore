@@ -12,5 +12,10 @@ api/test
 
 data
 
+# 本地凭据与私密备注。当前 Dockerfile 是逐路径 COPY、不会带上它们，
+# 但排除掉可以挡住将来有人写 `COPY . .` 时把密码烙进镜像层。
+.env
+*.local
+
 **/.DS_Store
 *.log

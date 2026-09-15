@@ -1,19 +1,28 @@
-# 本机构建版：从源码构建「nginx + api」单镜像并运行（见根目录 Dockerfile）。
+# 镜像部署版 compose —— 直接拉取 CI 构建好的镜像运行，
+# 本机不需要任何构建环境（不需要 Node、不需要 npm、不需要 frontend/ 和 api/ 源码）。
+#
+# 镜像是「nginx + api」合并后的单镜像，由 .github/workflows/docker.yml 在每次 push 到 main 时
+# 构建并推送到 GHCR。GHCR 上这个包是 public，pull 不需要 docker login。
+# 镜像为多平台产物（linux/amd64 + linux/arm64），Apple Silicon 与 x86 服务器都能直接跑。
 #
 # 用法：
-#   docker compose up -d --build
+#   docker compose -f docker-compose.image.yml pull        # 拉取（可选，up 时会自动拉）
+#   docker compose -f docker-compose.image.yml up -d
+#   docker compose -f docker-compose.image.yml logs -f
 #
-# 不想本机构建、直接用 CI 构建好的镜像，用 docker-compose.image.yml。
+# 部署前需要准备好（镜像里不含这些，属于运行时数据）：
+#   1. .env            —— 必需。至少要 ADMIN_USERNAME 和 ADMIN_TOKEN（令牌至少 8 位）。
+#                        缺任一项 compose 会在启动容器前直接报错。
+#   2. config/conf.yml —— 必需。配置真源，由 api 读写。可先从仓库拷一份。
+#   3. data/           —— 建议先 mkdir -p data，用于存放配置备份。
+#
+# 想固定版本而不是跟随 latest，把下面的 tag 换成具体版本（例如 :1.0.0）即可。
 
 name: docker-tools-dashboard
 
 services:
   app:
-    build:
-      context: .
-      dockerfile: Dockerfile
-    # 给本地构建的镜像起个名字，便于 docker images 里辨认
-    image: docker-tools-dashboard:local
+    image: ghcr.io/runtime-exception/home-dashboard:latest
     restart: unless-stopped
     # 用 tini 做 PID 1：回收僵尸进程，并把 docker stop 的信号转发给 entrypoint
     init: true
