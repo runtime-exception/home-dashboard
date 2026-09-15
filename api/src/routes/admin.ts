@@ -5,6 +5,7 @@ import { ApiError, toFieldErrors } from '../config/errors.ts'
 import { normalizeConfig } from '../config/migrate.ts'
 import { configSchema, type AppConfig } from '../config/schema.ts'
 import type { AppContext } from '../context.ts'
+import { resolveIcon } from '../icons/icon-url.ts'
 import { requireSession } from './session.ts'
 
 interface Envelope {
@@ -156,8 +157,25 @@ export function registerAdminRoutes(app: FastifyInstance, ctx: AppContext): void
     })
   })
 
-  // ── 标签 ───────────────────────────────────────────────────
+  /**
+   * 从工具地址推断它的图标地址，供控制台「自动获取图标」使用。
+   *
+   * 只回传一个 URL、不回传图片内容，所以它不会变成任意内容的代理。
+   * 这确实会让服务端去请求调用方给出的地址（SSRF 面），属于刻意为之：
+   * 管控台本来就要请求内网工具地址才能探活，且这个接口在 requireSession 之后，
+   * 只对已登录的管理员开放。
+   */
+  app.post('/api/admin/icon-probe', async (request) => {
+    guard(request)
+    const body = asRecord(request.body)
+    const url = body.url
+    if (typeof url !== 'string' || !url.trim()) {
+      throw new ApiError('VALIDATION_FAILED', '请求体缺少 url 字段')
+    }
+    return resolveIcon(url.trim())
+  })
 
+  // ── 标签 ───────────────────────────────────────────────────
   app.post('/api/admin/tags', async (request) => {
     const tag = asRecord(request.body)
     return mutate(request, (draft) => {
